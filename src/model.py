@@ -4,7 +4,7 @@ import mysql.connector
 
 
 class Model:
-    # Global Variables
+    # Class Variables
     db_config = {
         "host": "lochnagar.abertay.ac.uk",
         "user": "sql2301376",
@@ -14,37 +14,43 @@ class Model:
 
     # Constructor
     def __init__(self):
-        # As soon as program is booted, get system information
+        # As soon as program is booted, get system information and adds to database if not already added
+        # This does not include extra information or purchase date
         sys_name = platform.node()
         type = platform.system()
         model = platform.release()
         manufacturer = platform.machine()
         ip_address = socket.gethostbyname(socket.gethostname())
 
-        all_assets = Model.get_all_assets()
+        this_computer = (sys_name, model, manufacturer, type, ip_address)
 
-        for asset in all_assets:
-            if asset[1] == sys_name:
-                break
+        try:
+            conn = mysql.connector.connect(**Model.db_config)
+            curs = conn.cursor()
+
+            select_query = "SELECT * FROM assets WHERE `sys-name` = %s AND `model` = %s AND manufacturer = %s AND type = %s AND `ip-address` = %s"
+            insert_query = "INSERT INTO assets (`sys-name`, `model`, `manufacturer`, `type`, `ip-address`) VALUES (%s, %s, %s, %s, %s)"
+
+            # Checks if computer is in database
+            curs.execute(select_query, this_computer)
+            this_computer_in_database = curs.fetchone()
+
+            if not this_computer_in_database:
+                curs.execute(insert_query, this_computer)
+                conn.commit()
+                print("Computer not in database - added successfully")
             else:
-                try:
-                    conn = mysql.connector.connect(**Model.db_config)
-                    curs = conn.cursor()
+                print("Computer already in database")
+        except mysql.connector.Error as e:
+            print(e)
 
-                    data = (sys_name, model, manufacturer, type, ip_address)
-                    query = "INSERT INTO assets (`sys-name`, `model`, `manufacturer`, `type`, `ip-address`) VALUES (%s, %s, %s, %s, %s)"
+        finally:
+            if "curs" in locals():
+                curs.close()
+            if "conn" in locals():
+                conn.close()
 
-                    curs.execute(query, data)
-                    conn.commit()
-
-                    print("Inserted Successfully")
-                except mysql.connector.Error as e:
-                    print("Failed to connect to database")
-
-    # Close connection to database
-    def close_connection(self, conn):
-        conn.close()
-
+    # Gets all assets from database
     def get_all_assets(self):
         try:
             conn = mysql.connector.connect(**Model.db_config)
@@ -55,5 +61,104 @@ class Model:
 
             return res
         except mysql.connector.Error as e:
-            print("Failed to connect to database")
+            print(e)
             # Print error if connection to database fails
+
+    # Creates a new asset in the database
+    def insert_asset(
+        self,
+        system_name,
+        model,
+        manufacturer,
+        type,
+        ip_address,
+        additional_info,
+        purchase_date,
+    ):
+        try:
+            conn = mysql.connector.connect(**Model.db_config)
+            curs = conn.cursor()
+
+            data = (
+                system_name,
+                model,
+                manufacturer,
+                type,
+                ip_address,
+                additional_info,
+                purchase_date,
+            )
+            insert_query = "INSERT INTO `assets` (`sys-name`, `model`, `manufacturer`, `type`, `ip-address`, `additional-info`, `purchase-date`) VALUES (%s, %s, %s, %s, %s, %s, %s, )"
+
+            curs.execute(insert_query, data)
+            conn.commit()
+
+            print("Asset Added")
+        except mysql.connector.Error as e:
+            print(e)
+
+    # Gets an asset from the database by using it's ID
+    def delete_data(self, id):
+        try:
+            conn = mysql.connector.connect(**Model.db_config)
+            curs = conn.cursor()
+
+            delete_query = "DELETE FROM assets WHERE id=%s"
+
+            curs.execute(delete_query, id)
+            conn.commit()
+
+            print("Asset Deleted")
+        except mysql.connector.Error as e:
+            print(e)
+
+    # Gets an asset from the database by using it's ID
+    def get_asset_by_id(self, id):
+        try:
+            conn = mysql.connector.connect(**Model.db_config)
+            curs = conn.cursor()
+
+            find_query = "SELECT * FROM assets WHERE id=%s"
+
+            curs.execute(find_query, id)
+            conn.commit()
+
+            print("Asset Deleted")
+        except mysql.connector.Error as e:
+            print(e)
+
+    # Edits an existing asset by using it's ID
+    def edit_asset(
+        self,
+        id,
+        system_name,
+        model,
+        manufacturer,
+        type,
+        ip_address,
+        additional_info,
+        purchase_date,
+    ):
+        try:
+            conn = mysql.connector.connect(**Model.db_config)
+            curs = conn.cursor()
+
+            data = (
+                system_name,
+                model,
+                manufacturer,
+                type,
+                ip_address,
+                additional_info,
+                purchase_date,
+                id,
+            )
+
+            edit_query = "UPDATE assets SET `sys-name`=%s, `model`=%s, `manufacturer`=%s, `type`=%s, `ip-address`=%s, `additional-info`=%s, `purchase-date`=%s WHERE id=%s"
+
+            curs.execute(edit_query, data)
+            conn.commit()
+
+            print("Asset Edited")
+        except mysql.connector.Error as e:
+            print(e)

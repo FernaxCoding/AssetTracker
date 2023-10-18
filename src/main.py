@@ -6,5 +6,6 @@ from model import Model
 if __name__ == "__main__":
     root = tk.Tk()
     model = Model()
-    controller = Controller(model, view := View(root, model))
+    view = View(root)
+    controller = Controller(model, view)
     root.mainloop()

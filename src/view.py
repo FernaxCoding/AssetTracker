@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
 
+
 class View:
-    def __init__(self, root, controller):
+    def __init__(self, root, model):
         self.root = root
-        self.controller = controller
+        self.model = model
 
         root.geometry("1280x640")
         root.title("Asset Tracker")
@@ -15,10 +16,26 @@ class View:
 
         def open_add():
             print("Filler")
+
         def open_delete():
             print("Filler")
 
-        table = ttk.Treeview(root, columns=("System ID", "System Name", "Model", "Manufacturer", "Type", "IP Address", "Additional Information", "Purchase Date"))
+        def open_edit():
+            print("Filler")
+
+        table = ttk.Treeview(
+            root,
+            columns=(
+                "System ID",
+                "System Name",
+                "Model",
+                "Manufacturer",
+                "Type",
+                "IP Address",
+                "Additional Information",
+                "Purchase Date",
+            ),
+        )
 
         table.heading("#1", text="System ID")
         table.heading("#2", text="System Name")
@@ -28,7 +45,7 @@ class View:
         table.heading("#6", text="IP Address")
         table.heading("#6", text="Additional Information")
         table.heading("#7", text="Purchase Date")
-        
+
         table.column("#1", width=100)
         table.column("#2", width=100)
         table.column("#3", width=100)
@@ -37,13 +54,45 @@ class View:
         table.column("#6", width=100)
         table.column("#6", width=200)
         table.column("#7", width=100)
-        
+
         # Temporary data
         data = [
-            ('Computer1', 'Model1', 'Manufacturer1', 'Type1', '192.168.1.1', 'Additional Info 1', '2023-10-13'),
-            ('Computer1', 'Model1', 'Manufacturer1', 'Type1', '192.168.1.1', 'Additional Info 1', '2023-10-13'),
-            ('Computer1', 'Model1', 'Manufacturer1', 'Type1', '192.168.1.1', 'Additional Info 1', '2023-10-13'),
-            ('Computer1', 'Model1', 'Manufacturer1', 'Type1', '192.168.1.1', 'Additional Info 1', '2023-10-13')
+            (
+                "Computer1",
+                "Model1",
+                "Manufacturer1",
+                "Type1",
+                "192.168.1.1",
+                "Additional Info 1",
+                "2023-10-13",
+            ),
+            (
+                "Computer1",
+                "Model1",
+                "Manufacturer1",
+                "Type1",
+                "192.168.1.1",
+                "Additional Info 1",
+                "2023-10-13",
+            ),
+            (
+                "Computer1",
+                "Model1",
+                "Manufacturer1",
+                "Type1",
+                "192.168.1.1",
+                "Additional Info 1",
+                "2023-10-13",
+            ),
+            (
+                "Computer1",
+                "Model1",
+                "Manufacturer1",
+                "Type1",
+                "192.168.1.1",
+                "Additional Info 1",
+                "2023-10-13",
+            ),
         ]
 
         for item in data:
