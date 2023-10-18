@@ -1,11 +1,16 @@
 import tkinter as tk
 from tkinter import ttk
+from view import View
 
 
 class Controller:
-    def __init__(self, model, view):
+    def __init__(self, model, root):
         self.model = model
-        self.view = view
+        self.view = View(root, self)
 
-        # All assets from database
-        all_assets = model.get_all_assets()
+        all_assets = self.model.get_all_assets()
+        self.view
+
+    def populate_table(self):
+        all_assets = self.model.get_all_assets()
+        self.view

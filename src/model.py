@@ -57,6 +57,8 @@ class Model:
             curs = conn.cursor()
 
             curs.execute("SELECT * FROM assets")
+            conn.commit()
+
             res = curs.fetchall()
 
             return res
@@ -123,7 +125,9 @@ class Model:
             curs.execute(find_query, id)
             conn.commit()
 
-            print("Asset Deleted")
+            res = curs.fetchone()
+
+            return res
         except mysql.connector.Error as e:
             print(e)
 

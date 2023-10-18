@@ -3,9 +3,9 @@ from tkinter import ttk
 
 
 class View:
-    def __init__(self, root, model):
+    def __init__(self, root, controller):
         self.root = root
-        self.model = model
+        self.controller = controller
 
         root.geometry("1280x640")
         root.title("Asset Tracker")
