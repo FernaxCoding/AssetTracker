@@ -25,7 +25,7 @@ class Model:
         this_computer = (sys_name, model, manufacturer, type, ip_address)
 
         try:
-            conn = mysql.connector.connect(**Model.db_config)
+            conn = mysql.connector.connect(**self.db_config)
             curs = conn.cursor()
 
             select_query = "SELECT * FROM assets WHERE `sys-name` = %s AND `model` = %s AND manufacturer = %s AND type = %s AND `ip-address` = %s"
@@ -33,33 +33,37 @@ class Model:
 
             # Checks if computer is in database
             curs.execute(select_query, this_computer)
-            this_computer_in_database = curs.fetchone()
+            this_computer_in_database = curs.fetchall()
 
             if not this_computer_in_database:
                 curs.execute(insert_query, this_computer)
                 conn.commit()
                 print("Computer not in database - added successfully")
+                curs.close()
+                conn.close()
             else:
                 print("Computer already in database")
+                curs.close()
+                conn.close()
         except mysql.connector.Error as e:
             print(e)
-
-        finally:
-            if "curs" in locals():
-                curs.close()
-            if "conn" in locals():
-                conn.close()
 
     # Gets all assets from database
     def get_all_assets(self):
         try:
-            conn = mysql.connector.connect(**Model.db_config)
+            conn = mysql.connector.connect(**self.db_config)
             curs = conn.cursor()
 
-            curs.execute("SELECT * FROM assets")
-            conn.commit()
+            select_all_query = "SELECT * FROM assets"
+            curs.execute(select_all_query)
 
             res = curs.fetchall()
+
+            # for row in res:
+            #     print(row)
+
+            curs.close()
+            conn.close()
 
             return res
         except mysql.connector.Error as e:

@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import mysql.connector
 
 
 class View:
@@ -37,65 +38,31 @@ class View:
             ),
         )
 
-        table.heading("#1", text="System ID")
-        table.heading("#2", text="System Name")
-        table.heading("#3", text="Model")
-        table.heading("#4", text="Manufacturer")
-        table.heading("#5", text="Type")
-        table.heading("#6", text="IP Address")
+        table.heading("#0", text="System ID")
+        table.heading("#1", text="System Name")
+        table.heading("#2", text="Model")
+        table.heading("#3", text="Manufacturer")
+        table.heading("#4", text="Type")
+        table.heading("#5", text="IP Address")
         table.heading("#6", text="Additional Information")
         table.heading("#7", text="Purchase Date")
 
+        table.column("#0", width=100)
         table.column("#1", width=100)
         table.column("#2", width=100)
         table.column("#3", width=100)
         table.column("#4", width=100)
         table.column("#5", width=100)
-        table.column("#6", width=100)
         table.column("#6", width=200)
         table.column("#7", width=100)
 
-        # Temporary data
-        data = [
-            (
-                "Computer1",
-                "Model1",
-                "Manufacturer1",
-                "Type1",
-                "192.168.1.1",
-                "Additional Info 1",
-                "2023-10-13",
-            ),
-            (
-                "Computer1",
-                "Model1",
-                "Manufacturer1",
-                "Type1",
-                "192.168.1.1",
-                "Additional Info 1",
-                "2023-10-13",
-            ),
-            (
-                "Computer1",
-                "Model1",
-                "Manufacturer1",
-                "Type1",
-                "192.168.1.1",
-                "Additional Info 1",
-                "2023-10-13",
-            ),
-            (
-                "Computer1",
-                "Model1",
-                "Manufacturer1",
-                "Type1",
-                "192.168.1.1",
-                "Additional Info 1",
-                "2023-10-13",
-            ),
-        ]
+        # Populate table with data
+        assets = controller.populate_table()
 
-        for item in data:
-            table.insert("", "end", values=item)
+        for row in assets:
+            asset_id = row[0]
+            asset_info = row[1:]
+
+            table.insert("", "end", text=asset_id, values=asset_info)
 
         table.pack()
