@@ -99,9 +99,9 @@ class Model:
             curs.execute(insert_query, data)
             conn.commit()
 
-            print("Asset Added")
+            return "Asset Added!"
         except mysql.connector.Error as e:
-            print(e)
+            return e
 
     # Gets an asset from the database by using it's ID
     def delete_data(self, id):

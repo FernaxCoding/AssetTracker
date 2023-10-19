@@ -13,3 +13,10 @@ class Controller:
     def populate_table(self):
         all_assets = self.model.get_all_assets()
         return all_assets
+
+    def insert(
+        self, sys_name, model, manufacturer, type, ip, additional_info, purchase
+    ):
+        self.model.insert_asset(
+            sys_name, model, manufacturer, type, ip, additional_info, purchase
+        )
