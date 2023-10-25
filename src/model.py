@@ -85,6 +85,13 @@ class Model:
             conn = mysql.connector.connect(**Model.db_config)
             curs = conn.cursor()
 
+            if not additional_info.strip():
+                additional_info = None
+
+            if not purchase_date.strip():
+                purchase_date = None
+
+
             data = (
                 system_name,
                 model,
@@ -94,7 +101,8 @@ class Model:
                 additional_info,
                 purchase_date,
             )
-            insert_query = "INSERT INTO `assets` (`sys-name`, `model`, `manufacturer`, `type`, `ip-address`, `additional-info`, `purchase-date`) VALUES (%s, %s, %s, %s, %s, %s, %s, )"
+
+            insert_query = "INSERT INTO `assets`(`sys-name`, `model`, `manufacturer`, `type`, `ip-address`, `additional-info`, `purchase-date`) VALUES (%s, %s, %s, %s, %s, %s, %s)"
 
             curs.execute(insert_query, data)
             conn.commit()

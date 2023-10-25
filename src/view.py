@@ -22,20 +22,28 @@ class View:
                 def destroy_add():
                     add.destroy()
                     success_window.destroy()
+                
+                sys_name = sys_name.get()
+                model = model.get()
+                manufacturer = manufacturer.get()
+                type = type.get()
+                ip = ip.get()
+                additional_info = additional_info.get("1.0", "end")
+                purchase = purchase.get()
 
                 error_label = tk.Label(add, text="Please enter dates in the format yyyy/mm/dd")
                 date_format = r"\d{4}/\d{2}/\d{2}"
 
-                if re.match(date_format, purchase):
+                if re.match(date_format, purchase) or purchase == "":
                     success = controller.insert(sys_name, model, manufacturer, type, ip, additional_info, purchase)
 
                     success_window = tk.Tk()
                     success_window.geometry("300x300")
                     success_window.title("Asset Added")
-                    success_label = tk.Label(success_window, text=success, font=("Helvetica", 24))
+                    success_label = tk.Label(success_window, text=success, font=("Helvetica", 8))
                     success_label.pack()
 
-                    quit_button = tk.Button(root, text="OK", command=lambda: destroy_add())
+                    quit_button = tk.Button(success_window, text="OK", command=lambda: destroy_add())
                     quit_button.pack(side="bottom")
                 else:
                     error_label.pack()
@@ -88,13 +96,8 @@ class View:
             purchase = tk.Entry(add)
             purchase.pack()
 
-            sys_name = sys_name.get()
-            model = model.get()
-            manufacturer = manufacturer.get()
-            type = type.get()
-            ip = ip.get()
-            additional_info = additional_info.get()
-            purchase = purchase.get()
+            submit_button = tk.Button(add, text="Submit", command=lambda: submit(sys_name, model, manufacturer, type, ip, additional_info, purchase))
+            submit_button.pack(side="bottom")
 
         def open_delete():
             print("Filler")

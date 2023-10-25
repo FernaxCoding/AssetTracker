@@ -17,6 +17,6 @@ class Controller:
     def insert(
         self, sys_name, model, manufacturer, type, ip, additional_info, purchase
     ):
-        self.model.insert_asset(
+        return self.model.insert_asset(
             sys_name, model, manufacturer, type, ip, additional_info, purchase
         )
