@@ -71,16 +71,7 @@ class Model:
             # Print error if connection to database fails
 
     # Creates a new asset in the database
-    def insert_asset(
-        self,
-        system_name,
-        model,
-        manufacturer,
-        type,
-        ip_address,
-        additional_info,
-        purchase_date,
-    ):
+    def insert_asset(self, system_name, model, manufacturer, type, ip_address, additional_info, purchase_date,):
         try:
             conn = mysql.connector.connect(**Model.db_config)
             curs = conn.cursor()
@@ -92,15 +83,7 @@ class Model:
                 purchase_date = None
 
 
-            data = (
-                system_name,
-                model,
-                manufacturer,
-                type,
-                ip_address,
-                additional_info,
-                purchase_date,
-            )
+            data = (system_name, model, manufacturer, type, ip_address, additional_info ,purchase_date,)
 
             insert_query = "INSERT INTO `assets`(`sys-name`, `model`, `manufacturer`, `type`, `ip-address`, `additional-info`, `purchase-date`) VALUES (%s, %s, %s, %s, %s, %s, %s)"
 
@@ -144,31 +127,12 @@ class Model:
             print(e)
 
     # Edits an existing asset by using it's ID
-    def edit_asset(
-        self,
-        id,
-        system_name,
-        model,
-        manufacturer,
-        type,
-        ip_address,
-        additional_info,
-        purchase_date,
-    ):
+    def edit_asset(self,id,system_name,model,manufacturer,type,ip_address,additional_info,purchase_date):
         try:
             conn = mysql.connector.connect(**Model.db_config)
             curs = conn.cursor()
 
-            data = (
-                system_name,
-                model,
-                manufacturer,
-                type,
-                ip_address,
-                additional_info,
-                purchase_date,
-                id,
-            )
+            data = (system_name, model, manufacturer, type, ip_address, additional_info, purchase_date, id,)
 
             edit_query = "UPDATE assets SET `sys-name`=%s, `model`=%s, `manufacturer`=%s, `type`=%s, `ip-address`=%s, `additional-info`=%s, `purchase-date`=%s WHERE id=%s"
 
@@ -178,3 +142,19 @@ class Model:
             print("Asset Edited")
         except mysql.connector.Error as e:
             print(e)
+
+    def add_employee(self, first_name, last_name, email, department):
+        try:
+            conn = mysql.connector.connect(**Model.db_config)
+            curs = conn.cursor()
+
+            data = (first_name, last_name, email, department)
+
+            insert_query = "INSERT INTO employees (first_name, last_name, email_address, department) VALUES (%s, %s, %s, %s)"
+        
+            curs.execute(insert_query, data)
+            conn.commit()
+
+            return "Employee Added!"
+        except mysql.connector.Error as e:
+            return e

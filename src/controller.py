@@ -14,9 +14,9 @@ class Controller:
         all_assets = self.model.get_all_assets()
         return all_assets
 
-    def insert(
-        self, sys_name, model, manufacturer, type, ip, additional_info, purchase
-    ):
-        return self.model.insert_asset(
-            sys_name, model, manufacturer, type, ip, additional_info, purchase
-        )
+    def insert(self, sys_name, model, manufacturer, type, ip, additional_info, purchase):
+        return self.model.insert_asset(sys_name, model, manufacturer, type, ip, additional_info, purchase)
+    
+    def add_employee(self, first_name, last_name, email, department):
+        return self.model.add_employee(first_name, last_name, email, department)
+

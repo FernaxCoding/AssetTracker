@@ -33,8 +33,9 @@ class View:
 
                 error_label = tk.Label(add, text="Please enter dates in the format yyyy/mm/dd")
                 date_format = r"\d{4}/\d{2}/\d{2}"
+                ip_format = r'^(\d{1,3}\.){3}\d{1,3}$'
 
-                if re.match(date_format, purchase) or purchase == "":
+                if re.match(date_format, purchase) and re.match(ip_format, ip):
                     success = controller.insert(sys_name, model, manufacturer, type, ip, additional_info, purchase)
 
                     success_window = tk.Tk()
@@ -105,6 +106,63 @@ class View:
         def open_edit():
             print("Filler")
 
+        def open_emp():
+
+            def submit(first_name, last_name, email, department):
+
+                def destroy_add():
+                    add.destroy()
+                    success_window.destroy()
+                
+                first_name = first_name.get()
+                last_name = last_name.get()
+                email = email.get()
+                department = department.get()
+
+                success = controller.add_employee(first_name, last_name, email, department)
+
+                success_window = tk.Tk()
+                success_window.geometry("300x300")
+                success_window.title("Asset Added")
+                success_label = tk.Label(success_window, text=success, font=("Helvetica", 8))
+                success_label.pack()
+
+                quit_button = tk.Button(success_window, text="OK", command=lambda: destroy_add())
+                quit_button.pack(side="bottom")
+
+            # New window for Adding Employee
+            add = tk.Tk()
+            add.geometry("1280x640")
+            add.title("Add Asset")
+            title_label = tk.Label(add, text="Add Asset", font=("Helvetica", 24))
+            title_label.pack(pady=20)
+
+            first_name_label = tk.Label(add, text="Enter First Name: ")
+            first_name_label.pack()
+            first_name = tk.Entry(add)
+            first_name.pack()
+
+            last_name_label = tk.Label(add, text="Enter Surname: ")
+            last_name_label.pack()
+            last_name = tk.Entry(add)
+            last_name.pack()
+
+            email_label = tk.Label(add, text="Enter Email: ")
+            email_label.pack()
+            email = tk.Entry(add)
+            email.pack()
+
+            department_label = tk.Label(add, text="Select Department: ")
+            department_label.pack()
+
+            departments = ['finance', 'human resources', 'operations', 'sales', 'information technology']
+            selected_department = tk.StringVar()
+            department = ttk.Combobox(add, textvariable=selected_department, values=departments, state="readonly")
+            department.pack()
+
+            submit_button = tk.Button(add, text="Submit", command=lambda: submit(first_name, last_name, email, department))
+            submit_button.pack(side="bottom")
+
         # Table with all asset info from database
         table = ttk.Treeview(
             root,
@@ -149,7 +207,7 @@ class View:
 
         table.pack()
 
-        # Buttons for add, edit, delete
+        # Buttons for add, edit, delete assets
 
         button_add = tk.Button(root, text="Add asset", command=lambda: open_add())
         button_add.pack()
@@ -159,3 +217,8 @@ class View:
 
         button_delete = tk.Button(root, text="Delete asset", command=lambda: open_delete())
         button_delete.pack(side="top")
+
+        # Button for adding employee
+
+        button_emp = tk.Button(root, text="Add Employee", command=lambda: open_emp())
+        button_emp.pack(side="top")
