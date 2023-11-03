@@ -17,7 +17,7 @@ class View:
 
         def open_add():
 
-            def submit(sys_name, model, manufacturer, type, ip, additional_info, purchase):
+            def submit(sys_name, model, manufacturer, type, ip, additional_info, purchase, employee):
 
                 def destroy_add():
                     add.destroy()
@@ -30,13 +30,15 @@ class View:
                 ip = ip.get()
                 additional_info = additional_info.get("1.0", "end")
                 purchase = purchase.get()
+                employee = employee.get()
 
-                error_label = tk.Label(add, text="Please enter dates in the format yyyy/mm/dd")
-                date_format = r"\d{4}/\d{2}/\d{2}"
+                error_label_date = tk.Label(add, text="Please enter dates in the format yyyy-mm-dd")
+                error_label_ip = tk.Label(add, text="Please enter IP in the format XXX.XXX.XXX.XXX")
+                date_format = r"(\d{4})-(\d{2})-(\d{2})"
                 ip_format = r'^(\d{1,3}\.){3}\d{1,3}$'
 
                 if re.match(date_format, purchase) and re.match(ip_format, ip):
-                    success = controller.insert(sys_name, model, manufacturer, type, ip, additional_info, purchase)
+                    success = controller.insert(sys_name, model, manufacturer, type, ip, additional_info, purchase, employee)
 
                     success_window = tk.Tk()
                     success_window.geometry("300x300")
@@ -46,12 +48,10 @@ class View:
 
                     quit_button = tk.Button(success_window, text="OK", command=lambda: destroy_add())
                     quit_button.pack(side="bottom")
-                else:
-                    error_label.pack()
-
-                controller.insert(
-                    sys_name, model, manufacturer, type, ip, additional_info, purchase
-                )
+                elif(not re.match(date_format, purchase)):
+                    error_label_date.pack()
+                elif(not re.match(ip_format, ip)):
+                    error_label_ip.pack()
 
             # New window for Add
             add = tk.Tk()
@@ -97,14 +97,131 @@ class View:
             purchase = tk.Entry(add)
             purchase.pack()
 
-            submit_button = tk.Button(add, text="Submit", command=lambda: submit(sys_name, model, manufacturer, type, ip, additional_info, purchase))
+            employee_label = tk.Label(add, text="Choose Employee (by ID): ")
+            employee_label.pack()
+            employees = controller.get_all_employees()
+            selected_employee = tk.StringVar()
+            employee = ttk.Combobox(add, textvariable=selected_employee, values=employees, state="readonly")
+            employee.pack()
+
+            submit_button = tk.Button(add, text="Submit", command=lambda: submit(sys_name, model, manufacturer, type, ip, additional_info, purchase, employee))
             submit_button.pack(side="bottom")
 
         def open_delete():
             print("Filler")
 
         def open_edit():
-            print("Filler")
+            def edit_window(asset):
+                def submit_changes(id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee):
+                    
+                    sys_name = sys_name.get()
+                    model = model.get()
+                    manufacturer = manufacturer.get()
+                    type = type.get()
+                    ip = ip.get()
+                    additional_info = additional_info.get("1.0", "end")
+                    purchase = purchase.get()
+                    employee = employee.get()
+                    employee_id = employee[0]
+
+                    error_label_date = tk.Label(submit, text="Please enter dates in the format yyyy-mm-dd")
+                    error_label_ip = tk.Label(submit, text="Please enter IP in the format XXX.XXX.XXX.XXX")
+                    date_format = r"(\d{4})-(\d{2})-(\d{2})"
+                    ip_format = r'^(\d{1,3}\.){3}\d{1,3}$'
+
+                    if re.match(date_format, purchase) and re.match(ip_format, ip):
+                        success = controller.update(id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee_id)
+
+                        success_label = tk.Label(submit, text=success, font=("Helvetica", 8))
+                        success_label.pack()
+
+                        quit_button = tk.Button(submit, text="OK", command=lambda: submit.destroy())
+                        quit_button.pack(side="bottom")
+                    elif(not re.match(date_format, purchase)):
+                        error_label_date.pack()
+                    elif(not re.match(ip_format, ip)):
+                        error_label_ip.pack()
+
+                submit = tk.Tk()
+                submit.geometry("1280x640")
+                submit.title("Edit Asset")
+                title_label = tk.Label(submit, text="Edit Asset", font=("Helvetica", 24))
+                title_label.pack(pady=20)
+                
+                asset = asset.get()
+                retreived_asset = self.controller.get_asset_by_id(asset)
+                
+                sys_name_label = tk.Label(submit, text="Enter System Name: ")
+                sys_name_label.pack()
+                sys_name = tk.Entry(submit)
+                sys_name.pack()
+                sys_name.insert(0, retreived_asset[1])
+
+                model_label = tk.Label(submit, text="Enter Model: ")
+                model_label.pack()
+                model = tk.Entry(submit)
+                model.pack()
+                model.insert(0, retreived_asset[2])
+
+                manufacturer_label = tk.Label(submit, text="Enter Manufacturer: ")
+                manufacturer_label.pack()
+                manufacturer = tk.Entry(submit)
+                manufacturer.pack()
+                manufacturer.insert(0, retreived_asset[3])
+
+                type_label = tk.Label(submit, text="Enter Type: ")
+                type_label.pack()
+                type = tk.Entry(submit)
+                type.pack()
+                type.insert(0, retreived_asset[4])
+
+                ip_label = tk.Label(submit, text="Enter IP Address: ")
+                ip_label.pack()
+                ip = tk.Entry(submit)
+                ip.pack()
+                ip.insert(0, retreived_asset[5])
+
+                additional_info_label = tk.Label(submit, text="Enter Additional Info (optional): ")
+                additional_info_label.pack()
+                additional_info = tk.Text(submit, width="40", height="10")
+                additional_info.pack()
+                additional_info.insert("1.0", (retreived_asset[6],))
+
+                purchase_label = tk.Label(submit, text="Enter Purchase date: ")
+                purchase_label.pack()
+                purchase = tk.Entry(submit)
+                purchase.pack()
+                purchase.insert(0, retreived_asset[7])
+
+                employee_label = tk.Label(submit, text="Choose Employee (by ID): ")
+                employee_label.pack()
+                employees = controller.get_all_employees()
+                selected_employee = tk.StringVar()
+                employee = ttk.Combobox(submit, textvariable=selected_employee, values=employees, state="readonly")
+                employee.pack()
+                employee.set((retreived_asset[8],))
+
+                id = retreived_asset[0]
+
+                submit_button_2 = tk.Button(submit, text="Submit", command=lambda: submit_changes(id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee))
+                submit_button_2.pack(side="bottom")
+
+            edit = tk.Tk()
+            edit.geometry("1280x640")
+            edit.title("Choose Asset")
+            title_label = tk.Label(edit, text="Choose Asset", font=("Helvetica", 24))
+            title_label.pack(pady=20)
+
+            asset_label = tk.Label(edit, text="Choose Asset")
+            asset_label.pack()
+            assets = controller.get_all_assets()
+            selected_asset = tk.StringVar()
+            asset = ttk.Combobox(edit, textvariable=selected_asset, values=assets, state="readonly")
+            asset.pack()
+
+            submit_button = tk.Button(edit, text="Submit", command=lambda: edit_window(asset))
+            submit_button.pack(side="bottom")
+
 
         def open_emp():
 
@@ -133,7 +250,7 @@ class View:
             # New window for Adding Employee
             add = tk.Tk()
             add.geometry("1280x640")
-            add.title("Add Asset")
+            add.title("Add Employee")
             title_label = tk.Label(add, text="Add Asset", font=("Helvetica", 24))
             title_label.pack(pady=20)
 
@@ -186,6 +303,7 @@ class View:
         table.heading("#5", text="IP Address")
         table.heading("#6", text="Additional Information")
         table.heading("#7", text="Purchase Date")
+        table.heading("#8", text="Employee ID")
 
         table.column("#0", width=100)
         table.column("#1", width=100)
@@ -195,9 +313,9 @@ class View:
         table.column("#5", width=100)
         table.column("#6", width=200)
         table.column("#7", width=120)
-        table.column("#8", width=0)
+        table.column("#8", width=120)
         # Populate table with data
-        assets = controller.populate_table()
+        assets = controller.get_all_assets()
 
         for row in assets:
             asset_id = row[0]
