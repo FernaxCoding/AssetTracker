@@ -28,5 +28,8 @@ class Controller:
     
     def update(self, id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee_id):
         return self.model.edit_asset(id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee_id)
+    
+    def delete_asset(self, asset):
+        return self.model.delete_data(asset)
 
 

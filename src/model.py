@@ -64,7 +64,7 @@ class Model:
 
             return res
         except mysql.connector.Error as e:
-            print(e)
+            return(e)
             # Print error if connection to database fails
 
     # Creates a new asset in the database
@@ -92,19 +92,21 @@ class Model:
             return e
 
     # Gets an asset from the database by using it's ID
-    def delete_data(self, id):
+    def delete_data(self, asset):
         try:
             conn = mysql.connector.connect(**Model.db_config)
             curs = conn.cursor()
+
+            id = (asset[0],)
 
             delete_query = "DELETE FROM assets WHERE id=%s"
 
             curs.execute(delete_query, id)
             conn.commit()
 
-            print("Asset Deleted")
+            return "Asset Deleted!"
         except mysql.connector.Error as e:
-            print(e)
+            return e
 
     # Gets an asset from the database by using it's ID
     def get_asset_by_id(self, asset):
@@ -115,21 +117,19 @@ class Model:
 
             asset_list = asset.split()
             id = (asset_list[0],)
-            print(asset)
-            print(id)
+            
             find_query = "SELECT * FROM assets WHERE id = %s"
 
             curs.execute(find_query, id)
 
             res = curs.fetchone()
 
-            print(res)
             curs.close()
             conn.close()
 
             return res
         except mysql.connector.Error as e:
-            print(e)
+            return(e)
 
     # Edits an existing asset by using it's ID
     def edit_asset(self,id,system_name,model,manufacturer,type,ip_address,additional_info,purchase_date,employee_id):
