@@ -15,6 +15,18 @@ class View:
         title_label = tk.Label(root, text="Asset Tracker", font=("Helvetica", 24))
         title_label.pack(pady=20)
 
+        def clear_tree():
+            for row in controller.get_all_assets():
+                table.delete(row)
+
+        def populate_tree():
+            assets = controller.get_all_assets()
+            for row in assets:
+                asset_id = row[0]
+                asset_info = row[1:]
+
+                table.insert("", "end", text=asset_id, values=asset_info)
+
         def open_add():
 
             def submit(sys_name, model, manufacturer, type, ip, additional_info, purchase, employee):
@@ -39,6 +51,9 @@ class View:
                     success_window.title("Asset Added")
                     success_label = tk.Label(success_window, text=success, font=("Helvetica", 8))
                     success_label.pack()
+
+                    clear_tree()
+                    populate_tree()
 
                     quit_button = tk.Button(success_window, text="OK", command=lambda: success_window.destroy())
                     quit_button.pack(side="bottom")
@@ -121,6 +136,10 @@ class View:
                     response = self.controller.delete_asset(asset)
                     response_label = tk.Label(confirm_delete, text=response, font=("Helvetica", 8))
                     response_label.pack()
+
+                    clear_tree()
+                    populate_tree()
+
                     quit = tk.Button(delete, text="Quit", command=lambda: kill())
                     quit.pack()
                 
@@ -186,6 +205,9 @@ class View:
 
                         success_label = tk.Label(submit, text=success, font=("Helvetica", 8))
                         success_label.pack()
+                        
+                        clear_tree()
+                        populate_tree()
 
                         quit_button = tk.Button(submit, text="OK", command=lambda: submit.destroy())
                         quit_button.pack(side="bottom")
@@ -387,14 +409,20 @@ class View:
         table.column("#6", width=200)
         table.column("#7", width=120)
         table.column("#8", width=120)
-        # Populate table with data
-        assets = controller.get_all_assets()
+        
+        def clear_tree():
+            for row in table.get_children():
+                table.delete(row)
 
-        for row in assets:
-            asset_id = row[0]
-            asset_info = row[1:]
+        def populate_tree():
+            assets = controller.get_all_assets()
+            for row in assets:
+                asset_id = row[0]
+                asset_info = row[1:]
 
-            table.insert("", "end", text=asset_id, values=asset_info)
+                table.insert("", "end", text=asset_id, values=asset_info)
+        
+        populate_tree()
 
         table.pack()
 
