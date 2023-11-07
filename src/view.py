@@ -57,9 +57,9 @@ class View:
 
                     quit_button = tk.Button(success_window, text="OK", command=lambda: success_window.destroy())
                     quit_button.pack(side="bottom")
-                elif(not re.match(date_format, purchase)):
+                elif(not re.match(date_format, purchase) and purchase):
                     error_label_date.config(text="Please enter dates in the format yyyy-mm-dd")
-                elif(not re.match(ip_format, ip)):
+                elif(not re.match(ip_format, ip) and ip):
                     error_label_ip.config(text="Please enter IP in the format XXX.XXX.XXX.XXX")
                 else:
                     error_label_fill.config(text="Make sure all the relevent fields are populated")
@@ -71,44 +71,42 @@ class View:
             title_label = tk.Label(add, text="Add Asset", font=("Helvetica", 24))
             title_label.pack(pady=20)
 
-            sys_name_label = tk.Label(add, text="Enter System Name: ")
+            sys_name_label = tk.Label(add, text="*Enter System Name: ")
             sys_name_label.pack()
             sys_name = tk.Entry(add)
             sys_name.pack()
 
-            model_label = tk.Label(add, text="Enter Model: ")
+            model_label = tk.Label(add, text="*Enter Model: ")
             model_label.pack()
             model = tk.Entry(add)
             model.pack()
 
-            manufacturer_label = tk.Label(add, text="Enter Manufacturer: ")
+            manufacturer_label = tk.Label(add, text="*Enter Manufacturer: ")
             manufacturer_label.pack()
             manufacturer = tk.Entry(add)
             manufacturer.pack()
 
-            type_label = tk.Label(add, text="Enter Type: ")
+            type_label = tk.Label(add, text="*Enter Type: ")
             type_label.pack()
             type = tk.Entry(add)
             type.pack()
 
-            ip_label = tk.Label(add, text="Enter IP Address: ")
+            ip_label = tk.Label(add, text="*Enter IP Address: ")
             ip_label.pack()
             ip = tk.Entry(add)
             ip.pack()
 
-            additional_info_label = tk.Label(
-                add, text="Enter Additional Info (optional): "
-            )
+            additional_info_label = tk.Label(add, text="Enter Additional Info (optional): ")
             additional_info_label.pack()
             additional_info = tk.Text(add, width="40", height="10")
             additional_info.pack()
 
-            purchase_label = tk.Label(add, text="Enter Purchase date: ")
+            purchase_label = tk.Label(add, text="Enter Purchase date (optional): ")
             purchase_label.pack()
             purchase = tk.Entry(add)
             purchase.pack()
 
-            employee_label = tk.Label(add, text="Choose Employee (by ID): ")
+            employee_label = tk.Label(add, text="*Choose Employee (by ID): ")
             employee_label.pack()
             employees = controller.get_all_employees()
             selected_employee = tk.StringVar()
@@ -120,7 +118,7 @@ class View:
             error_label_fill = tk.Label(add, text="")
             error_label_date.pack()
             error_label_ip.pack()
-            error_label_fill()
+            error_label_fill.pack()
 
             submit_button = tk.Button(add, text="Submit", command=lambda: submit(sys_name, model, manufacturer, type, ip, additional_info, purchase, employee))
             submit_button.pack(side="bottom")
@@ -200,7 +198,7 @@ class View:
                     date_format = r"(\d{4})-(\d{2})-(\d{2})" 
                     ip_format = r'^(\d{1,3}\.){3}\d{1,3}$'
 
-                    if re.match(date_format, purchase) and re.match(ip_format, ip) and sys_name and model and manufacturer and type and ip and employee:
+                    if (re.match(date_format, purchase) or not purchase) and re.match(ip_format, ip) and sys_name and model and manufacturer and type and ip and employee:
                         success = controller.update(id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee_id)
 
                         success_label = tk.Label(submit, text=success, font=("Helvetica", 8))
@@ -211,9 +209,9 @@ class View:
 
                         quit_button = tk.Button(submit, text="OK", command=lambda: submit.destroy())
                         quit_button.pack(side="bottom")
-                    elif(not re.match(date_format, purchase)):
+                    elif(not re.match(date_format, purchase) and purchase):
                         error_label_date.config(text="Please enter dates in the format yyyy-mm-dd")
-                    elif(not re.match(ip_format, ip)):
+                    elif(not re.match(ip_format, ip) and ip):
                         error_label_ip.config(text="Please enter IP in the format XXX.XXX.XXX.XXX")
                     else:
                         error_label_fill.config(text="Make sure all the relevent fields are populated")
@@ -228,31 +226,31 @@ class View:
                     title_label = tk.Label(submit, text="Edit Asset", font=("Helvetica", 24))
                     title_label.pack(pady=20)
                     
-                    sys_name_label = tk.Label(submit, text="Enter System Name: ")
+                    sys_name_label = tk.Label(submit, text="*Enter System Name: ")
                     sys_name_label.pack()
                     sys_name = tk.Entry(submit)
                     sys_name.pack()
                     sys_name.insert(0, retreived_asset[1])
 
-                    model_label = tk.Label(submit, text="Enter Model: ")
+                    model_label = tk.Label(submit, text="*Enter Model: ")
                     model_label.pack()
                     model = tk.Entry(submit)
                     model.pack()
                     model.insert(0, retreived_asset[2])
 
-                    manufacturer_label = tk.Label(submit, text="Enter Manufacturer: ")
+                    manufacturer_label = tk.Label(submit, text="*Enter Manufacturer: ")
                     manufacturer_label.pack()
                     manufacturer = tk.Entry(submit)
                     manufacturer.pack()
                     manufacturer.insert(0, retreived_asset[3])
 
-                    type_label = tk.Label(submit, text="Enter Type: ")
+                    type_label = tk.Label(submit, text="*Enter Type: ")
                     type_label.pack()
                     type = tk.Entry(submit)
                     type.pack()
                     type.insert(0, retreived_asset[4])
 
-                    ip_label = tk.Label(submit, text="Enter IP Address: ")
+                    ip_label = tk.Label(submit, text="*Enter IP Address: ")
                     ip_label.pack()
                     ip = tk.Entry(submit)
                     ip.pack()
@@ -264,13 +262,13 @@ class View:
                     additional_info.pack()
                     additional_info.insert("1.0", (retreived_asset[6],))
 
-                    purchase_label = tk.Label(submit, text="Enter Purchase date: ")
+                    purchase_label = tk.Label(submit, text="Enter Purchase date (optional): ")
                     purchase_label.pack()
                     purchase = tk.Entry(submit)
                     purchase.pack()
                     purchase.insert(0, retreived_asset[7])
 
-                    employee_label = tk.Label(submit, text="Choose Employee (by ID): ")
+                    employee_label = tk.Label(submit, text="*Choose Employee (by ID): ")
                     employee_label.pack()
                     employees = controller.get_all_employees()
                     selected_employee = tk.StringVar()
