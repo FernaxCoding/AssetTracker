@@ -10,43 +10,7 @@ class Model:
         "user": "sql2301376",
         "password": "sweet angel friday nest",
         "database": "sql2301376",
-    }
-
-    # Constructor
-    def __init__(self):
-        # As soon as program is booted, get system information and adds to database if not already added
-        # This does not include extra information or purchase date
-        sys_name = platform.node()
-        type = platform.system()
-        model = platform.release()
-        manufacturer = platform.machine()
-        ip_address = socket.gethostbyname(socket.gethostname())
-
-        this_computer = (sys_name, model, manufacturer, type, ip_address)
-
-        try:
-            conn = mysql.connector.connect(**self.db_config)
-            curs = conn.cursor()
-
-            select_query = "SELECT * FROM assets WHERE sys_name = %s AND model = %s AND manufacturer = %s AND type = %s AND ip_address = %s"
-            insert_query = "INSERT INTO assets (sys_name, model, manufacturer, type, ip_address) VALUES (%s, %s, %s, %s, %s)"
-
-            # Checks if computer is in database
-            curs.execute(select_query, this_computer)
-            this_computer_in_database = curs.fetchall()
-
-            if not this_computer_in_database:
-                curs.execute(insert_query, this_computer)
-                conn.commit()
-                print("Computer not in database - added successfully")
-                curs.close()
-                conn.close()
-            else:
-                print("Computer already in database")
-                curs.close()
-                conn.close()
-        except mysql.connector.Error as e:
-            print(e)
+    }  
 
     # Gets all assets from database
     def get_all_assets(self):
@@ -181,4 +145,59 @@ class Model:
         except mysql.connector.Error as e:
             return e
         
+    def validate_login(self, username):
+        try:
+            conn = mysql.connector.connect(**Model.db_config)
+            curs = conn.cursor()
+
+            username = (username,)
+
+            query = "SELECT * FROM employees WHERE email_address = %s"
+
+            curs.execute(query, username)
+            res = curs.fetchone()
+
+            print(res)
+
+            curs.close()
+            conn.close()
+
+            return res
+        except mysql.connector.Error as e:
+            return(e)
+            # Print error if connection to database fails
+        
+    def successful_login(self, emp_id):
+        # On a successful, get system information and adds to database if not already added
+        # This does not include extra information or purchase date
+
+        sys_name = platform.node()
+        type = platform.system()
+        model = platform.release()
+        manufacturer = platform.machine()
+        ip_address = socket.gethostbyname(socket.gethostname())
+
+        this_computer = (sys_name, model, manufacturer, type, ip_address, emp_id)
+
+        try:
+            conn = mysql.connector.connect(**Model.db_config)
+            curs = conn.cursor()
+
+            select_query = "SELECT * FROM assets WHERE sys_name = %s AND model = %s AND manufacturer = %s AND type = %s AND ip_address = %s AND employee_id = %s"
+            insert_query = "INSERT INTO assets (sys_name, model, manufacturer, type, ip_address) VALUES (%s, %s, %s, %s, %s, %s)"
+
+            # Checks if computer is in database
+            curs.execute(select_query, this_computer)
+            this_computer_in_database = curs.fetchall()
+
+            if not this_computer_in_database:
+                curs.execute(insert_query, this_computer)
+                conn.commit()
+                print("Computer not in database - added successfully")
+            else:
+                print("Computer already in database")
+            curs.close()
+            conn.close()
+        except mysql.connector.Error as e:
+            print(e)
     

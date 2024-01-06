@@ -31,5 +31,11 @@ class Controller:
     
     def delete_asset(self, asset):
         return self.model.delete_data(asset)
+    
+    def validate_login(self, username):
+        return self.model.validate_login(username)
+    
+    def successful_login(self, id):
+        self.model.successful_login(id)
 
 
