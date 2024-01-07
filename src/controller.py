@@ -10,8 +10,8 @@ class Controller:
         self.view = View(root, self)
 
     # Used to populate the table on the main menu
-    def get_all_assets(self):
-        all_assets = self.model.get_all_assets()
+    def get_all_assets(self, table):
+        all_assets = self.model.get_all_assets(table)
         return all_assets
 
     def insert(self, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee):
@@ -23,8 +23,8 @@ class Controller:
     def get_all_employees(self):
         return self.model.get_all_employees()
     
-    def get_asset_by_id(self, id):
-        return self.model.get_asset_by_id(id)
+    def get_asset_by_id(self, id, table):
+        return self.model.get_asset_by_id(id, table)
     
     def update(self, id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee_id):
         return self.model.edit_asset(id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee_id)
@@ -37,5 +37,8 @@ class Controller:
     
     def successful_login(self, id):
         self.model.successful_login(id)
+
+    def update_software(self, id, sys_name, version, manufacturer):
+        return self.model.edit_asset_software(id, sys_name, version, manufacturer)
 
 
