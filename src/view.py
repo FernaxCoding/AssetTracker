@@ -727,7 +727,57 @@ class View:
 
                 submit_button = tk.Button(add, text="Submit", command=lambda: submit(first_name, last_name, email, department))
                 submit_button.pack(side="bottom")
+
+            def open_link():
+
+                def chosen_link(asset_hardware, asset_software):
                     
+                    def kill():
+                        success_window.destroy()
+                        link.destroy()
+
+                    asset_hardware = asset_hardware.get()
+                    asset_software = asset_software.get()
+
+                    asset_hardware_id = asset_hardware[0]
+                    asset_software_id = asset_software[0]
+                    response = controller.link_assets(asset_hardware_id, asset_software_id)
+
+                    if (response == "Assets Linked!"):
+                        success_window = tk.Tk()
+                        success_window.geometry("300x300")
+                        success_window.title("Asset Added")
+                        success_label = tk.Label(success_window, text=response, font=("Helvetica", 8))
+                        success_label.pack()
+
+                        quit_button = tk.Button(success_window, text="OK", command=lambda: kill())
+                        quit_button.pack(side="bottom")
+
+
+                link = tk.Tk()
+                link.geometry("1280x640")
+                link.title("Add Employee")
+                title_label = tk.Label(link, text="Add Employee", font=("Helvetica", 24))
+                title_label.pack(pady=20)
+
+                asset_hardware_label = tk.Label(link, text="Choose Asset")
+                asset_hardware_label.pack()
+                assets_hardware = controller.get_all_assets("assets")
+                selected_asset_hardware = tk.StringVar()
+                asset_hardware = ttk.Combobox(link, textvariable=selected_asset_hardware, values=assets_hardware, state="readonly")
+                asset_hardware.pack()
+
+                asset_software_label = tk.Label(link, text="Choose Asset")
+                asset_software_label.pack()
+                assets_software = controller.get_all_assets("assets")
+                selected_asset_software = tk.StringVar()
+                asset_software = ttk.Combobox(link, textvariable=selected_asset_software, values=assets_software, state="readonly")
+                asset_software.pack()
+
+                submit_button = tk.Button(link, text="Submit", command=lambda: chosen_link(asset_hardware, asset_software))
+                submit_button.pack(side="bottom")
+
+
             # Home Page: Buttons to take you to Hardware Assets, Software Assets, Linking assets and Adding Employee Pages
 
             button_hardware = tk.Button(home, text="Hardware Assets", command=lambda: open_hardware())
@@ -784,3 +834,20 @@ class View:
 
         error_label = tk.Label(root, text="")
         error_label.pack()
+
+
+# Notes for future:
+        
+# For Link page, make 2 Treeviews that import all the info from Hardware and Software assets.
+# Then take to a confirm option page and submit. Also make sure you submit it using the date the link was made.
+
+# After this, Start on Checking Vulnerabilities page. Keep the Software and Hardware vulnerability checks separate 
+# More research needs to be done into how to do this, maining connecting to external API 
+# No pop up window, configure labels on the page to show whether there is no vulnerabilities or there is vulnerabilities.
+# If there is vulnerabilities, list them with bullet points.
+        
+# After this, all extra requirements satisfied! :)
+# Double check if any inp[ut validatuion can be added, once completed move onto testing and after that writing the rest of the report
+        
+# STAY HARD MOTHERFUCKER!! - David Goggins
+        

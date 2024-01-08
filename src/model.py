@@ -3,7 +3,7 @@ import subprocess
 import socket
 import mysql.connector
 import re
-
+from datetime import date
 
 
 class Model:
@@ -278,6 +278,23 @@ class Model:
 
         except mysql.connector.Error as e:
             print(e)
+
+    def link_assets(self, asset_hardware_id, asset_software_id):
+        try:
+            conn = mysql.connector.connect(**Model.db_config)
+            curs = conn.cursor()
+
+            data = (asset_hardware_id, asset_software_id, date.today())
+
+            insert_query = "INSERT INTO assets_linked (hardware_id, software_id, date_linked) VALUES (%s, %s, %s)"
+
+            curs.execute(insert_query, data)
+            conn.commit()
+
+            return "Assets Linked!"
+        except mysql.connector.Error as e:
+            return e
+
 
         
     

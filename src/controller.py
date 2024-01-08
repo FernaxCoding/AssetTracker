@@ -40,5 +40,8 @@ class Controller:
 
     def update_software(self, id, sys_name, version, manufacturer):
         return self.model.edit_asset_software(id, sys_name, version, manufacturer)
+    
+    def link_assets(self, asset_hardware_id, asset_software_id):
+        return self.model.link_assets(asset_hardware_id, asset_software_id)
 
 
