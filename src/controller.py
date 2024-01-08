@@ -43,5 +43,8 @@ class Controller:
     
     def link_assets(self, asset_hardware_id, asset_software_id):
         return self.model.link_assets(asset_hardware_id, asset_software_id)
+    
+    def find_vulnerabilities(self, asset_name):
+        return self.model.find_vulnerabilities(asset_name)
 
 

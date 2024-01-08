@@ -4,6 +4,7 @@ import socket
 import mysql.connector
 import re
 from datetime import date
+import requests
 
 
 class Model:
@@ -294,6 +295,26 @@ class Model:
             return "Assets Linked!"
         except mysql.connector.Error as e:
             return e
+        
+    def find_vulnerabilities(self, asset_name):
+        base_url = "https://services.nvd.nist.gov/rest/json/cpes/1.0"
+        url = f"{base_url}?keyword={asset_name}"
+
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            data = response.json()
+
+            if ("result" in data and "cpes" in data["result"]):
+                cpes = data["result"]["cpes"]
+                return cpes
+            else:
+                return f"No vulnerabilites found for {asset_name}"
+            
+        except requests.exceptions.RequestException as e:
+            return f"Error: {e}"
+
+
 
 
         

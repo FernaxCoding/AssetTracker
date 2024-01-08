@@ -613,6 +613,51 @@ class View:
                         submit_button = tk.Button(edit, text="Submit", command=lambda: edit_window(asset))
                         submit_button.pack(side="bottom")
 
+                    def open_vulnerabilities():
+                        
+                        def find_vulnerabilities(asset):
+                            asset_list = asset.split()
+                            asset_name = asset_list[1]
+                            response = controller.find_vulnerabilities(asset_name)
+
+                            if (type(response) == list):
+                                title_label = tk.Label(vuln, text="Vulnerabilities Found:", font=("Helvetica", 8))
+                                title_label.pack()
+
+                                for vulnerability in response:
+                                    cpe_id = vulnerability.get("CPE ID", "N/A")
+                                    cve_ids = ", ".join(vulnerability.get("CVE IDs", []))
+                                    entry_text = f"CPE ID: {cpe_id}, CVE IDs: {cve_ids}"
+                                    vulnerabilites.insert(tk.END, entry_text)
+                            else:
+                                vulnerabilites.insert(tk.END, response)
+
+
+                        vuln = tk.Tk()
+                        vuln.geometry("1280x640")
+                        vuln.title("Check for Vulnerabilties")
+                        title_label = tk.Label(vuln, text="Check for Vulnerabilties", font=("Helvetica", 24))
+                        title_label.pack(pady=20)
+
+                        asset_label = tk.Label(vuln, text="Choose Asset")
+                        asset_label.pack()
+                        assets = controller.get_all_assets("assets_software")
+                        selected_asset = tk.StringVar()
+                        asset = ttk.Combobox(vuln, textvariable=selected_asset, values=assets, state="readonly")
+                        asset.pack()
+
+                        vuln_label = tk.Label(vuln, text="Vulnerabilities:")
+                        vuln_label.pack()
+
+                        vuln_frame = tk.Frame(vuln)
+                        vuln_frame.pack()
+
+                        vulnerabilites = tk.Listbox(vuln_frame, width=50, height=10)
+                        vulnerabilites.pack(side=tk.LEFT, fill=tk.BOTH)
+
+                        submit_button = tk.Button(vuln, text="Submit", command=lambda: find_vulnerabilities(asset))
+                        submit_button.pack(side="bottom")
+
                     # View all Software Assets
                     table = ttk.Treeview(
                         home,
@@ -660,6 +705,10 @@ class View:
 
                     button_delete = tk.Button(home, text="Delete asset", command=lambda: open_delete())
                     button_delete.pack(side="top")
+                    
+                    button_vuln = tk.Button(home, text="Check for Vulnerabilities", command=lambda: open_vulnerabilities())
+                    button_vuln.pack(side="top")
+                
 
             # Add an employee to the system
             def open_emp():
