@@ -36,56 +36,71 @@ class Model:
             # Print error if connection to database fails
 
     # Creates a new asset in the database
-    def insert_asset(self, system_name, model, manufacturer, type, ip_address, additional_information, purchase_date, employee):
-        try:
-            conn = mysql.connector.connect(**Model.db_config)
-            curs = conn.cursor()
+    def insert_asset(self, system_name, model, manufacturer, type, ip_address, additional_information, purchase_date, employee_id):
+        date_format = r"(\d{4})-(\d{2})-(\d{2})" 
+        ip_format = r'^(\d{1,3}\.){3}\d{1,3}$'
 
-            if not additional_information.strip():
-                additional_information = None
+        if re.match(date_format, purchase_date) and re.match(ip_format, ip_address) and system_name and model and manufacturer and type and ip_address and employee_id:
+            try:
+                conn = mysql.connector.connect(**Model.db_config)
+                curs = conn.cursor()
+                
+                
+                if not additional_information.strip():
+                    additional_information = None
 
-            if not purchase_date.strip():
-                purchase_date = None
+                if not purchase_date.strip():
+                    purchase_date = None
 
+                
 
-            data = (system_name, model, manufacturer, type, ip_address, additional_information , purchase_date, employee[0])
+                data = (system_name, model, manufacturer, type, ip_address, additional_information , purchase_date, employee_id)
 
-            insert_query = "INSERT INTO assets(sys_name, model, manufacturer, type, ip_address, additional_information, purchase_date, employee_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                insert_query = "INSERT INTO assets(sys_name, model, manufacturer, type, ip_address, additional_information, purchase_date, employee_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
 
-            curs.execute(insert_query, data)
-            conn.commit()
+                curs.execute(insert_query, data)
+                conn.commit()
 
-            return "Hardware Asset Added!"
-        except mysql.connector.Error as e:
-            return e
+                return "Hardware Asset Added!"
+            except mysql.connector.Error as e:
+                return e
+            
+        elif(not re.match(date_format, purchase_date) and purchase_date):
+            return "Please enter dates in the format yyyy-mm-dd"
+        elif(not re.match(ip_format, ip_address) and ip_address):
+           return "Please enter IP in the format XXX.XXX.XXX.XXX"
+        else:
+            return "Make sure all the relevent fields are populated"
         
     def insert_asset_software(self, system_name, version, manufacturer):
-        try:
-            conn = mysql.connector.connect(**Model.db_config)
-            curs = conn.cursor()
 
-            data = (system_name, version, manufacturer)
+        if system_name and version and manufacturer:
+            try:
+                conn = mysql.connector.connect(**Model.db_config)
+                curs = conn.cursor()
 
-            insert_query = "INSERT INTO assets_software (sys_name, version, manufacturer) VALUES (%s, %s, %s)"
+                data = (system_name, version, manufacturer)
 
-            curs.execute(insert_query, data)
-            conn.commit()
+                insert_query = "INSERT INTO assets_software (sys_name, version, manufacturer) VALUES (%s, %s, %s)"
 
-            return "Software Asset Added!"
-        except mysql.connector.Error as e:
-            return e
+                curs.execute(insert_query, data)
+                conn.commit()
+
+                return "Software Asset Added!"
+            except mysql.connector.Error as e:
+                return e
+        else:
+            return "Make sure all the relevent fields are populated"
 
     # Gets an asset from the database by using it's ID
-    def delete_data(self, asset, table):
+    def delete_data(self, id, table):
         try:
             conn = mysql.connector.connect(**Model.db_config)
             curs = conn.cursor()
 
-            id = (asset[0],)
+            delete_query = "DELETE FROM {} WHERE id=%s".format(table)
 
-            delete_query = "DELETE FROM %s WHERE id=%s"
-
-            curs.execute(delete_query, table, id)
+            curs.execute(delete_query, (id,))
             conn.commit()
 
             return "Asset Deleted!"
@@ -117,52 +132,120 @@ class Model:
 
     # Edits an existing asset by using it's ID
     def edit_asset(self,id,system_name,model,manufacturer,type,ip_address,additional_info,purchase_date,employee_id):
-        try:
-            conn = mysql.connector.connect(**Model.db_config)
-            curs = conn.cursor()
+        
+        date_format = r"(\d{4})-(\d{2})-(\d{2})" 
+        ip_format = r'^(\d{1,3}\.){3}\d{1,3}$'
 
-            data = (system_name, model, manufacturer, type, ip_address, additional_info, purchase_date, employee_id, id)
+        if (re.match(date_format, purchase_date) or not purchase_date) and re.match(ip_format, ip_address) and system_name and model and manufacturer and type and ip_address and employee_id:
 
-            edit_query = "UPDATE assets SET sys_name=%s, model=%s, manufacturer=%s, type=%s, ip_address=%s, additional_information=%s, purchase_date=%s, employee_id=%s WHERE id=%s"
+            try:
+                conn = mysql.connector.connect(**Model.db_config)
+                curs = conn.cursor()
 
-            curs.execute(edit_query, data)
-            conn.commit()
+                data = (system_name, model, manufacturer, type, ip_address, additional_info, purchase_date, employee_id, id)
 
-            return "Asset Edited Successfuly!"
-        except mysql.connector.Error as e:
-            return e
+                edit_query = "UPDATE assets SET sys_name=%s, model=%s, manufacturer=%s, type=%s, ip_address=%s, additional_information=%s, purchase_date=%s, employee_id=%s WHERE id=%s"
+
+                curs.execute(edit_query, data)
+                conn.commit()
+
+                return "Asset Edited Successfuly!"
+            except mysql.connector.Error as e:
+                return e
+            
+        elif(not re.match(date_format, purchase_date) and purchase_date):
+            return "Please enter dates in the format yyyy-mm-dd"
+        elif(not re.match(ip_format, ip_address) and ip_address):
+            return "Please enter IP in the format XXX.XXX.XXX.XXX"
+        else:
+           return "Make sure all the relevent fields are populated"
         
     def edit_asset_software(self,id,system_name,version,manufacturer):
+        if (id and system_name and version and manufacturer):
+            try:
+                conn = mysql.connector.connect(**Model.db_config)
+                curs = conn.cursor()
+
+                data = (system_name,version,manufacturer,id)
+
+                edit_query = "UPDATE assets_software SET sys_name=%s, version=%s, manufacturer=%s WHERE id=%s"
+
+                curs.execute(edit_query, data)
+                conn.commit()
+
+                return "Software Asset Edited Successfuly!"
+            except mysql.connector.Error as e:
+                return e
+        else:
+            return "Make sure all the relevent fields are populated"
+
+    def get_employee_by_email(email):
         try:
             conn = mysql.connector.connect(**Model.db_config)
             curs = conn.cursor()
+            
+            find_query = "SELECT * FROM employees WHERE email = %s"
 
-            data = (system_name,version,manufacturer,id)
+            curs.execute(find_query, email)
 
-            edit_query = "UPDATE assets_software SET sys_name=%s, version=%s, manufacturer=%s WHERE id=%s"
+            res = curs.fetchone()
 
-            curs.execute(edit_query, data)
-            conn.commit()
+            curs.close()
+            conn.close()
 
-            return "Software Asset Edited Successfuly!"
+            return res
         except mysql.connector.Error as e:
-            return e
+            return(e)
 
-    def add_employee(self, first_name, last_name, email, department):
-        try:
-            conn = mysql.connector.connect(**Model.db_config)
-            curs = conn.cursor()
+    def add_employee(self, first_name, last_name, email, department, password, re_password):
 
-            data = (first_name, last_name, email, department)
+        def get_employee_by_email(email):
+            try:
+                conn = mysql.connector.connect(**Model.db_config)
+                curs = conn.cursor()
+                
+                find_query = "SELECT * FROM employees WHERE email_address = %s"
 
-            insert_query = "INSERT INTO employees (first_name, last_name, email_address, department) VALUES (%s, %s, %s, %s)"
-        
-            curs.execute(insert_query, data)
-            conn.commit()
+                curs.execute(find_query, (email,))
 
-            return "Employee Added!"
-        except mysql.connector.Error as e:
-            return e
+                res = curs.fetchone()
+
+                curs.close()
+                conn.close()
+
+                return res
+            except mysql.connector.Error as e:
+                return(e)
+
+        if (first_name and last_name and email and department and password and re_password):
+
+            email_exists = get_employee_by_email(email)
+
+            if (password == re_password):
+
+                
+                if (not email_exists):
+
+                    try:
+                        conn = mysql.connector.connect(**Model.db_config)
+                        curs = conn.cursor()
+
+                        data = (first_name, last_name, email, department, password)
+
+                        insert_query = "INSERT INTO employees (first_name, last_name, email_address, department, password) VALUES (%s, %s, %s, %s, %s)"
+                    
+                        curs.execute(insert_query, data)
+                        conn.commit()
+
+                        return "Employee Added!"
+                    except mysql.connector.Error as e:
+                        return e
+                else:
+                    return "Email Already in use, please use a different email"
+            else:
+                return "Passwords do not match"
+        else:
+            return "Please make sure all relevent fields are populated"
 
     def get_all_employees(self):
         try:
@@ -193,8 +276,6 @@ class Model:
             curs.execute(query, username)
             res = curs.fetchone()
 
-            print(res)
-
             curs.close()
             conn.close()
 
@@ -221,7 +302,7 @@ class Model:
 
             hardware_info = (sys_name, model, manufacturer, type, ip_address, emp_id)
 
-            print(hardware_info)
+            
             
             return hardware_info
 
@@ -236,7 +317,7 @@ class Model:
 
             software_info = (sys_name, version, manufacturer)
 
-            print(software_info)
+            
 
             return software_info
 
@@ -263,6 +344,7 @@ class Model:
                 print("Hardware not in database - added successfully")
             else:
                 print("Hardware already in database")
+                
 
             curs.execute(select_query_software, software_info)
             this_software_in_database = curs.fetchall()
@@ -277,8 +359,11 @@ class Model:
             curs.close()
             conn.close()
 
+            return 1
+
         except mysql.connector.Error as e:
             print(e)
+            return 0
 
     def link_assets(self, asset_hardware_id, asset_software_id):
         try:

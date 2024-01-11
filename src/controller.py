@@ -1,8 +1,5 @@
-import tkinter as tk
-from tkinter import ttk
 from view import View
 from model import Model
-
 
 class Controller:
     def __init__(self, root):
@@ -17,8 +14,11 @@ class Controller:
     def insert(self, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee):
         return self.model.insert_asset(sys_name, model, manufacturer, type, ip, additional_info, purchase, employee)
     
-    def add_employee(self, first_name, last_name, email, department):
-        return self.model.add_employee(first_name, last_name, email, department)
+    def insert_software(self, sys_name, version, manufacturer):
+        return self.model.insert_asset_software(sys_name, version, manufacturer)
+    
+    def add_employee(self, first_name, last_name, email, department, password, re_password):
+        return self.model.add_employee(first_name, last_name, email, department, password, re_password)
     
     def get_all_employees(self):
         return self.model.get_all_employees()
@@ -29,14 +29,14 @@ class Controller:
     def update(self, id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee_id):
         return self.model.edit_asset(id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee_id)
     
-    def delete_asset(self, asset):
-        return self.model.delete_data(asset)
+    def delete_asset(self, id, table):
+        return self.model.delete_data(id, table)
     
     def validate_login(self, username):
         return self.model.validate_login(username)
     
     def successful_login(self, id):
-        self.model.successful_login(id)
+        return self.model.successful_login(id)
 
     def update_software(self, id, sys_name, version, manufacturer):
         return self.model.edit_asset_software(id, sys_name, version, manufacturer)

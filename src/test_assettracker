@@ -1,0 +1,96 @@
+import unittest
+from controller import Controller
+from model import Model 
+import mysql.connector
+from datetime import date
+
+# Unit tests 
+class TestSystem(unittest.TestCase):
+    
+    model = Model()
+
+    def test_login_username(self):
+        username_check = Controller.validate_login(self, "johnpork@gmail.com")
+        self.assertIsNotNone(username_check)
+
+    def test_login_incorrect_username(self):
+        username_check = Controller.validate_login(self, "billybob@gmail.com")
+        self.assertIsNone(username_check)
+
+    def test_get_all_assets_hardware(self):
+        self.assertIsNotNone(Controller.get_all_assets(self, "assets"))
+    
+    def test_get_all_assets_software(self):
+        self.assertIsNotNone(Controller.get_all_assets(self, "assets_software"))
+
+    def test_successful_login(self):
+        self.assertEqual(Controller.successful_login(self, "1"), 1)
+
+    def test_unsuccessful_login(self):
+        self.assertEqual(Controller.successful_login(self, "bob"), 0)
+
+    def test_add_hardware(self):
+        self.assertEquals(Controller.insert(self, "Jeff's Computer", "Jeff 10,000", "Linux", "x64-based PC", "192.32.41.5", "Xtra Info", "2004-05-04", 1), "Hardware Asset Added!")
+
+    def test_add_hardware_ip_fail(self):
+        self.assertEquals(Controller.insert(self, "Jeff's Computer", "Jeff 10,000", "Linux", "x64-based PC", "192/32/41/5", "Xtra Info", "2004-05-04", 1), "Please enter IP in the format XXX.XXX.XXX.XXX")
+
+    def test_add_hardware_date_fail(self):
+        self.assertEquals(Controller.insert(self, "Jeff's Computer", "Jeff 10,000", "Linux", "x64-based PC", "192.32.41.5", "Xtra Info", "04-05-2004", 1), "Please enter dates in the format yyyy-mm-dd")
+
+    def test_add_hardware_info_fail(self):
+        self.assertEquals(Controller.insert(self, "", "" , "", "", "", "", "", ""), "Make sure all the relevent fields are populated")
+
+    def test_add_software(self):
+        self.assertEquals(Controller.insert_software(self, "Windows 11", "9.3", "Microsoft"), "Software Asset Added!")
+
+    def test_add_software_info_fail(self):
+        self.assertEquals(Controller.insert_software(self, "", "" , ""), "Make sure all the relevent fields are populated")
+
+    def test_edit_hardware(self):
+        self.assertEquals(Controller.update(self, 1, "John's Computer", "John 10,000", "Linux", "x64-based PC", "192.32.41.5", "Xtra Info", "2007-06-17", 1), "Asset Edited Successfuly!")
+
+    def test_edit_hardware_ip_fail(self):
+        self.assertEquals(Controller.update(self, 1, "John's Computer", "John 10,000", "Linux", "x64-based PC", "192-32-41/5", "Xtra Info", "2007-06-17", 1), "Please enter IP in the format XXX.XXX.XXX.XXX")
+
+    def test_edit_hardware_date_fail(self):
+        self.assertEquals(Controller.update(self, 1, "John's Computer", "John 10,000", "Linux", "x64-based PC", "192.32.41.5", "Xtra Info", "17-06-2007", 1), "Please enter dates in the format yyyy-mm-dd")
+
+    def test_edit_hardware_info_fail(self):
+        self.assertEquals(Controller.update(self, 1, "", "", "", "", "", "", "", ""), "Make sure all the relevent fields are populated")
+
+    def test_edit_software(self):
+        self.assertEquals(Controller.update_software(self, 1, "Windows 11", "9.3", "Microsoft"), "Software Asset Edited Successfuly!")
+
+    def test_edit_software_info_fail(self):
+        self.assertEquals(Controller.update_software(self, "", "", "" , ""), "Make sure all the relevent fields are populated")
+
+    def test_delete_hardware(self):
+        self.assertEquals(Controller.delete_asset(self, 2, "assets"), "Asset Deleted!")
+
+    def test_delete_software(self):
+        self.assertEquals(Controller.delete_asset(self, 2, "assets_software"), "Asset Deleted!")
+
+    def test_add_employee(self):
+        self.assertEquals(Controller.add_employee(self, "Jane", "Doe", "thesoldiertf2@hotmail.com", "finance", "dixienormus", "dixienormus"), "Employee Added!")
+
+    def test_add_employee_in_use_email(self):
+        self.assertEquals(Controller.add_employee(self, "Jane", "Doe", "johnpork@gmail.com", "finance", "dixienormus", "dixienormus"), "Email Already in use, please use a different email")
+
+    def test_add_employee_passwords_dont_match(self):
+        self.assertEquals(Controller.add_employee(self, "Jane", "Doe", "johnpork@gmail.com", "finance", "dixienormus", "mikeockslong"), "Passwords do not match")
+
+    def test_add_employee_fail(self):
+        self.assertEquals(Controller.add_employee(self, "", "", "", "", "", ""), "Please make sure all relevent fields are populated")
+
+    def test_link_assets(self):
+        self.assertEquals(Controller.link_assets(self, 26, 8), "Assets Linked!")
+
+    def test_vulnerability_search(self):
+        self.assertIsNotNone(Controller.find_vulnerabilities(self, "Microsoft Windows 11 Home"))
+
+   
+
+
+if __name__ == '__main__':
+    unittest.main()

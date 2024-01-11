@@ -47,18 +47,16 @@ class View:
                         additional_info = additional_info.get("1.0", "end")
                         purchase = purchase.get()
                         employee = employee.get()
+                        employee = employee[0]
 
-                        # Formatting for dates
-                        date_format = r"(\d{4})-(\d{2})-(\d{2})" 
-                        ip_format = r'^(\d{1,3}\.){3}\d{1,3}$'
+                        resp = controller.insert(sys_name, model, manufacturer, type, ip, additional_info, purchase, employee)
 
-                        if re.match(date_format, purchase) and re.match(ip_format, ip) and sys_name and model and manufacturer and type and ip and employee:
-                            success = controller.insert(sys_name, model, manufacturer, type, ip, additional_info, purchase, employee)
+                        if (resp == "Hardware Asset Added!"):
                             add.destroy()
                             success_window = tk.Tk()
                             success_window.geometry("300x300")
                             success_window.title("Asset Added")
-                            success_label = tk.Label(success_window, text=success, font=("Helvetica", 8))
+                            success_label = tk.Label(success_window, text=resp, font=("Helvetica", 8))
                             success_label.pack()
 
                             clear_tree()
@@ -66,12 +64,12 @@ class View:
 
                             quit_button = tk.Button(success_window, text="OK", command=lambda: success_window.destroy())
                             quit_button.pack(side="bottom")
-                        elif(not re.match(date_format, purchase) and purchase):
-                            error_label_date.config(text="Please enter dates in the format yyyy-mm-dd")
-                        elif(not re.match(ip_format, ip) and ip):
-                            error_label_ip.config(text="Please enter IP in the format XXX.XXX.XXX.XXX")
+                        elif(resp == "Please enter dates in the format yyyy-mm-dd"):
+                            error_label_date.config(text=resp)
+                        elif(resp == "Please enter IP in the format XXX.XXX.XXX.XXX"):
+                            error_label_ip.config(text=resp)
                         else:
-                            error_label_fill.config(text="Make sure all the relevent fields are populated")
+                            error_label_fill.config(text=resp)
 
                     # Root Add window
                     add = tk.Tk()
@@ -145,7 +143,8 @@ class View:
 
                         # Send data to be deleted to model
                         def delete_asset(asset):
-                            response = self.controller.delete_asset(asset)
+                            id = (asset[0],)
+                            response = self.controller.delete_asset(id, "assets")
                             response_label = tk.Label(confirm_delete, text=response, font=("Helvetica", 8))
                             response_label.pack()
 
@@ -215,13 +214,11 @@ class View:
                             employee = employee.get()
                             employee_id = employee[0]
 
-                            date_format = r"(\d{4})-(\d{2})-(\d{2})" 
-                            ip_format = r'^(\d{1,3}\.){3}\d{1,3}$'
+                            resp = controller.update(id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee_id)
 
-                            if (re.match(date_format, purchase) or not purchase) and re.match(ip_format, ip) and sys_name and model and manufacturer and type and ip and employee:
-                                success = controller.update(id, sys_name, model, manufacturer, type, ip, additional_info, purchase, employee_id)
+                            if (resp == "Asset Edited Successfuly!"):
 
-                                success_label = tk.Label(submit, text=success, font=("Helvetica", 8))
+                                success_label = tk.Label(submit, text=resp, font=("Helvetica", 8))
                                 success_label.pack()
                                 
                                 clear_tree()
@@ -229,12 +226,12 @@ class View:
 
                                 quit_button = tk.Button(submit, text="OK", command=lambda: submit.destroy())
                                 quit_button.pack(side="bottom")
-                            elif(not re.match(date_format, purchase) and purchase):
-                                error_label_date.config(text="Please enter dates in the format yyyy-mm-dd")
-                            elif(not re.match(ip_format, ip) and ip):
-                                error_label_ip.config(text="Please enter IP in the format XXX.XXX.XXX.XXX")
+                            elif(resp=="Please enter dates in the format yyyy-mm-dd"):
+                                error_label_date.config(text=resp)
+                            elif(resp=="Please enter IP in the format XXX.XXX.XXX.XXX"):
+                                error_label_ip.config(text=resp)
                             else:
-                                error_label_fill.config(text="Make sure all the relevent fields are populated")
+                                error_label_fill.config(text=resp)
 
                         asset = asset.get()
                         if (asset):
@@ -418,13 +415,14 @@ class View:
                             version = version.get()
                             manufacturer = manufacturer.get()
 
-                            if sys_name and version and manufacturer:
-                                success = controller.insert_software(sys_name, version, manufacturer)
+                            resp = controller.insert_software(sys_name, version, manufacturer)
+
+                            if resp == "Software Asset Added!":
                                 add.destroy()
                                 success_window = tk.Tk()
                                 success_window.geometry("300x300")
                                 success_window.title("Asset Added")
-                                success_label = tk.Label(success_window, text=success, font=("Helvetica", 8))
+                                success_label = tk.Label(success_window, text=resp, font=("Helvetica", 8))
                                 success_label.pack()
 
                                 clear_tree()
@@ -433,7 +431,7 @@ class View:
                                 quit_button = tk.Button(success_window, text="OK", command=lambda: success_window.destroy())
                                 quit_button.pack(side="bottom")
                             else:
-                                error_label_fill.config(text="Make sure all the relevent fields are populated")
+                                error_label_fill.config(text=resp)
 
                         # Add window
                         add = tk.Tk()
@@ -476,7 +474,8 @@ class View:
 
                             # Send Software data to be deleted to model
                             def delete_asset(asset):
-                                response = self.controller.delete_asset(asset, "assets_software")
+                                id = (asset[0],)
+                                response = self.controller.delete_asset(id, "assets_software")
                                 response_label = tk.Label(confirm_delete, text=response, font=("Helvetica", 8))
                                 response_label.pack()
 
@@ -619,6 +618,7 @@ class View:
                             asset_list = asset.split()
                             asset_name = asset_list[1]
                             response = controller.find_vulnerabilities(asset_name)
+                            vulnerabilites.delete(0, tk.END)
 
                             if (type(response) == list):
                                 title_label = tk.Label(vuln, text="Vulnerabilities Found:", font=("Helvetica", 8))
@@ -714,7 +714,7 @@ class View:
             def open_emp():
                 
                 # Submit request to add employee to the systtem
-                def submit(first_name, last_name, email, department):
+                def submit(first_name, last_name, email, department, password, re_password):
 
                     # Destroys the add employee and success message windows
                     def destroy_add():
@@ -725,21 +725,28 @@ class View:
                     last_name = last_name.get()
                     email = email.get()
                     department = department.get()
+                    password = password.get()
+                    re_password = re_password.get()
 
-                    if (not first_name == "" and not last_name == "" and not email == "" and not department == ""):
-                        success = controller.add_employee(first_name, last_name, email, department)
-                        
+                    resp = controller.add_employee(first_name, last_name, email, department, password, re_password)
+
+                    if (resp == "Employee Added!"):
+
                         # Success window
                         success_window = tk.Tk()
                         success_window.geometry("300x300")
                         success_window.title("Employee Added")
-                        success_label = tk.Label(success_window, text=success, font=("Helvetica", 8))
+                        success_label = tk.Label(success_window, text=resp, font=("Helvetica", 8))
                         success_label.pack()
 
                         quit_button = tk.Button(success_window, text="OK", command=lambda: destroy_add())
                         quit_button.pack(side="bottom")
+                    elif (resp == "Email Already in use, please use a different email"):
+                        err_email.config(text=resp)
+                    elif (resp == "Passwords do not match"):
+                        err_pass.config(text=resp)
                     else:
-                        err.config(text="Make sure all fields are populated")
+                        err.config(text=resp)
 
                 # New window for Adding Employee
                 add = tk.Tk()
@@ -763,6 +770,16 @@ class View:
                 email = tk.Entry(add)
                 email.pack()
 
+                password_label = tk.Label(add, text="Enter Password: ")
+                password_label.pack()
+                password = tk.Entry(add)
+                password.pack()
+
+                re_password_label = tk.Label(add, text="Re-Enter Password: ")
+                re_password_label.pack()
+                re_password = tk.Entry(add)
+                re_password.pack()
+
                 department_label = tk.Label(add, text="Select Department: ")
                 department_label.pack()
 
@@ -773,6 +790,12 @@ class View:
 
                 err = tk.Label(add, text="", font=("Helvetica", 8))
                 err.pack()
+
+                err_pass = tk.Label(add, text="", font=("Helvetica", 8))
+                err_pass.pack()
+
+                err_email = tk.Label(add, text="", font=("Helvetica", 8))
+                err_email.pack()
 
                 submit_button = tk.Button(add, text="Submit", command=lambda: submit(first_name, last_name, email, department))
                 submit_button.pack(side="bottom")
@@ -850,9 +873,7 @@ class View:
         title_label = tk.Label(root, text="Asset Tracker", font=("Helvetica", 24))
         title_label.pack(pady=20)
 
-        def check_login():
-            username = entry_username.get()
-            password = entry_password.get()
+        def check_login(username, password):
 
             user_row = controller.validate_login(username)
 
@@ -878,7 +899,10 @@ class View:
         entry_password = tk.Entry(root, show="*")
         entry_password.pack(pady=10)
 
-        login_button = tk.Button(root, text="Login", command=check_login)
+        username = entry_username.get()
+        password = entry_password.get()
+
+        login_button = tk.Button(root, text="Login", command=check_login(username, password))
         login_button.pack(pady=20)
 
         error_label = tk.Label(root, text="")
