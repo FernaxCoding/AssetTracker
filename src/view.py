@@ -328,8 +328,14 @@ class View:
                     submit_button.pack(side="bottom")
 
                 # View all Hardware Assets
+                hardware = tk.Tk()
+                hardware.geometry("1280x640")
+                hardware.title("Hardware Assets")
+                title_label = tk.Label(hardware, text="Choose Asset", font=("Helvetica", 24))
+                title_label.pack(pady=20)
+
                 table = ttk.Treeview(
-                    home,
+                    hardware,
                     columns=(
                         "System ID",
                         "System Name",
@@ -380,13 +386,13 @@ class View:
 
                 # Buttons for add, edit, delete hardware assets
 
-                button_add = tk.Button(home, text="Add asset", command=lambda: open_add())
+                button_add = tk.Button(hardware, text="Add asset", command=lambda: open_add())
                 button_add.pack()
 
-                button_edit = tk.Button(home, text="Edit asset", command=lambda: open_edit())
+                button_edit = tk.Button(hardware, text="Edit asset", command=lambda: open_edit())
                 button_edit.pack(side="top")
 
-                button_delete = tk.Button(home, text="Delete asset", command=lambda: open_delete())
+                button_delete = tk.Button(hardware, text="Delete asset", command=lambda: open_delete())
                 button_delete.pack(side="top")
             
             # Software assets homepage
@@ -615,8 +621,12 @@ class View:
                     def open_vulnerabilities():
                         
                         def find_vulnerabilities(asset):
-                            asset_list = asset.split()
-                            asset_name = asset_list[1]
+                            asset = asset.get()
+                            
+                            start = asset.find('{') + 1
+                            end = asset.find('}')
+                            asset_name = asset[start:end].strip()
+                            
                             response = controller.find_vulnerabilities(asset_name)
                             vulnerabilites.delete(0, tk.END)
 
@@ -625,10 +635,14 @@ class View:
                                 title_label.pack()
 
                                 for vulnerability in response:
-                                    cpe_id = vulnerability.get("CPE ID", "N/A")
-                                    cve_ids = ", ".join(vulnerability.get("CVE IDs", []))
-                                    entry_text = f"CPE ID: {cpe_id}, CVE IDs: {cve_ids}"
-                                    vulnerabilites.insert(tk.END, entry_text)
+                                    cve = vulnerability.get("cve")
+                                    cve_id = cve.get("id")
+            
+                                    vulnerabilites.insert(tk.END, "CVE ID:")
+                                    vulnerabilites.insert(tk.END, cve_id)
+                                    vulnerabilites.insert(tk.END, "")
+                                if not response:
+                                    vulnerabilites.insert(tk.END, "No vulnerabilities found")
                             else:
                                 vulnerabilites.insert(tk.END, response)
 
@@ -658,9 +672,15 @@ class View:
                         submit_button = tk.Button(vuln, text="Submit", command=lambda: find_vulnerabilities(asset))
                         submit_button.pack(side="bottom")
 
+                    software = tk.Tk()
+                    software.geometry("1280x640")
+                    software.title("Hardware Assets")
+                    title_label = tk.Label(software, text="Choose Asset", font=("Helvetica", 24))
+                    title_label.pack(pady=20)
+
                     # View all Software Assets
                     table = ttk.Treeview(
-                        home,
+                        software,
                         columns=(
                             "OS ID",
                             "OS Name",
@@ -697,16 +717,16 @@ class View:
 
                     # Buttons for add, edit, delete assets
 
-                    button_add = tk.Button(home, text="Add asset", command=lambda: open_add())
+                    button_add = tk.Button(software, text="Add asset", command=lambda: open_add())
                     button_add.pack()
 
-                    button_edit = tk.Button(home, text="Edit asset", command=lambda: open_edit())
+                    button_edit = tk.Button(software, text="Edit asset", command=lambda: open_edit())
                     button_edit.pack(side="top")
 
-                    button_delete = tk.Button(home, text="Delete asset", command=lambda: open_delete())
+                    button_delete = tk.Button(software, text="Delete asset", command=lambda: open_delete())
                     button_delete.pack(side="top")
                     
-                    button_vuln = tk.Button(home, text="Check for Vulnerabilities", command=lambda: open_vulnerabilities())
+                    button_vuln = tk.Button(software, text="Check for Vulnerabilities", command=lambda: open_vulnerabilities())
                     button_vuln.pack(side="top")
                 
 
@@ -797,7 +817,7 @@ class View:
                 err_email = tk.Label(add, text="", font=("Helvetica", 8))
                 err_email.pack()
 
-                submit_button = tk.Button(add, text="Submit", command=lambda: submit(first_name, last_name, email, department))
+                submit_button = tk.Button(add, text="Submit", command=lambda: submit(first_name, last_name, email, department, password, re_password))
                 submit_button.pack(side="bottom")
 
             def open_link():
@@ -811,8 +831,12 @@ class View:
                     asset_hardware = asset_hardware.get()
                     asset_software = asset_software.get()
 
-                    asset_hardware_id = asset_hardware[0]
-                    asset_software_id = asset_software[0]
+                    asset_hardware.split()
+                    asset_software.split()
+
+                    asset_hardware_id = (asset_hardware[0],)
+                    asset_software_id = (asset_software[0],)
+
                     response = controller.link_assets(asset_hardware_id, asset_software_id)
 
                     if (response == "Assets Linked!"):
@@ -825,28 +849,27 @@ class View:
                         quit_button = tk.Button(success_window, text="OK", command=lambda: kill())
                         quit_button.pack(side="bottom")
 
-
                 link = tk.Tk()
                 link.geometry("1280x640")
-                link.title("Add Employee")
+                link.title("Link assets")
                 title_label = tk.Label(link, text="Add Employee", font=("Helvetica", 24))
                 title_label.pack(pady=20)
 
-                asset_hardware_label = tk.Label(link, text="Choose Asset")
+                asset_hardware_label = tk.Label(link, text="Choose Hardware Asset")
                 asset_hardware_label.pack()
                 assets_hardware = controller.get_all_assets("assets")
                 selected_asset_hardware = tk.StringVar()
                 asset_hardware = ttk.Combobox(link, textvariable=selected_asset_hardware, values=assets_hardware, state="readonly")
                 asset_hardware.pack()
 
-                asset_software_label = tk.Label(link, text="Choose Asset")
+                asset_software_label = tk.Label(link, text="Choose Software Asset")
                 asset_software_label.pack()
-                assets_software = controller.get_all_assets("assets")
+                assets_software = controller.get_all_assets("assets_software")
                 selected_asset_software = tk.StringVar()
                 asset_software = ttk.Combobox(link, textvariable=selected_asset_software, values=assets_software, state="readonly")
                 asset_software.pack()
 
-                submit_button = tk.Button(link, text="Submit", command=lambda: chosen_link(asset_hardware, asset_software))
+                submit_button = tk.Button(link, text="Submit", command=lambda: chosen_link(selected_asset_hardware, selected_asset_software))
                 submit_button.pack(side="bottom")
 
 
@@ -858,7 +881,7 @@ class View:
             button_software = tk.Button(home, text="Software Assets", command=lambda: open_software())
             button_software.pack()
 
-            button_employee = tk.Button(home, text="Software Assets", command=lambda: open_emp())
+            button_employee = tk.Button(home, text="Add Employee", command=lambda: open_emp())
             button_employee.pack()
 
             button_link = tk.Button(home, text="Link Assets by ID", command=lambda: open_link())
@@ -873,9 +896,14 @@ class View:
         title_label = tk.Label(root, text="Asset Tracker", font=("Helvetica", 24))
         title_label.pack(pady=20)
 
-        def check_login(username, password):
+        def check_login():
+            username = entry_username.get()
+            password = entry_password.get()
 
             user_row = controller.validate_login(username)
+
+            if (user_row == None):
+                error_label.config(text="User does not exist")
 
             id = user_row[0]
             db_username = user_row[3]
@@ -884,10 +912,8 @@ class View:
             if (username == db_username and password == db_password):
                 successful_login(id)
                 root.destroy()
-            elif(username != db_username):
-                error_label.config(text="User does not exist in database")
-            elif(password != db_password):
-                error_label.config(text="Incorrect Password")
+            else:
+                error_label2.config(text="Incorrect Password")
 
         label_username = tk.Label(root, text="Username:")
         label_username.pack(pady=10)
@@ -899,15 +925,13 @@ class View:
         entry_password = tk.Entry(root, show="*")
         entry_password.pack(pady=10)
 
-        username = entry_username.get()
-        password = entry_password.get()
-
-        login_button = tk.Button(root, text="Login", command=check_login(username, password))
+        login_button = tk.Button(root, text="Login", command=check_login)
         login_button.pack(pady=20)
 
         error_label = tk.Label(root, text="")
         error_label.pack()
-
+        error_label2 = tk.Label(root, text="")
+        error_label2.pack()
 
 # Notes for future:
         

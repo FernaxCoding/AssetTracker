@@ -22,8 +22,8 @@ class Model:
             conn = mysql.connector.connect(**self.db_config)
             curs = conn.cursor()
 
-            select_all_query = "SELECT * FROM %s"
-            curs.execute(select_all_query, table)
+            select_all_query = "SELECT * FROM {}".format(table)
+            curs.execute(select_all_query)
 
             res = curs.fetchall()
 
@@ -100,7 +100,7 @@ class Model:
 
             delete_query = "DELETE FROM {} WHERE id=%s".format(table)
 
-            curs.execute(delete_query, (id,))
+            curs.execute(delete_query, id)
             conn.commit()
 
             return "Asset Deleted!"
@@ -117,9 +117,9 @@ class Model:
             asset_list = asset.split()
             id = (asset_list[0],)
             
-            find_query = "SELECT * FROM %s WHERE id = %s"
+            find_query = "SELECT * FROM {} WHERE id = %s".format(table)
 
-            curs.execute(find_query, table, id)
+            curs.execute(find_query, id)
 
             res = curs.fetchone()
 
@@ -382,19 +382,22 @@ class Model:
             return e
         
     def find_vulnerabilities(self, asset_name):
-        base_url = "https://services.nvd.nist.gov/rest/json/cpes/1.0"
-        url = f"{base_url}?keyword={asset_name}"
+        base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0"
+        url = f"{base_url}?keywordSearch={asset_name}"
 
         try:
             response = requests.get(url)
             response.raise_for_status()
             data = response.json()
 
-            if ("result" in data and "cpes" in data["result"]):
-                cpes = data["result"]["cpes"]
-                return cpes
+            print(data)
+
+            if "vulnerabilities" in data:
+                vulnerabilites = data["vulnerabilities"]
+                return vulnerabilites
+            
             else:
-                return f"No vulnerabilites found for {asset_name}"
+                return f"No vulnerabilities found for {asset_name}"
             
         except requests.exceptions.RequestException as e:
             return f"Error: {e}"
